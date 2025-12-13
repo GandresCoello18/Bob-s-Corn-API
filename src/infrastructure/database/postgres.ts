@@ -1,13 +1,14 @@
 import { Pool, PoolConfig } from 'pg';
-import { getEnv } from '../../config/env';
-import { Logger } from '../../config/logger';
+
+import { getEnv } from '@config/env';
+import { Logger } from '@config/logger';
 
 export class PostgresClient {
   private pool: Pool;
 
   constructor(private logger: Logger) {
     const env = getEnv();
-    
+
     const config: PoolConfig = {
       connectionString: env.DATABASE_URL,
       max: 20,
@@ -54,4 +55,3 @@ export class PostgresClient {
     }
   }
 }
-

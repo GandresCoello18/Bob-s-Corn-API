@@ -1,9 +1,12 @@
-import Fastify, { FastifyInstance } from 'fastify';
 import cors from '@fastify/cors';
-import { Logger } from './config/logger';
-import { PostgresClient } from './infrastructure/database/postgres';
-import { RedisClient } from './infrastructure/cache/redis';
-import { healthRoutes } from './routes/health';
+import Fastify, { FastifyInstance } from 'fastify';
+
+import { healthRoutes } from '@/routes/health';
+
+import { RedisClient } from '@infrastructure/cache/redis';
+import { PostgresClient } from '@infrastructure/database/postgres';
+
+import { Logger } from '@config/logger';
 
 export interface AppDependencies {
   logger: Logger;
@@ -47,4 +50,3 @@ export async function buildApp(dependencies: AppDependencies): Promise<FastifyIn
 
   return app;
 }
-

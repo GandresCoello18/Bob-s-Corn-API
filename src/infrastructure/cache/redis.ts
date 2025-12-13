@@ -1,13 +1,14 @@
 import Redis, { RedisOptions } from 'ioredis';
-import { getEnv } from '../../config/env';
-import { Logger } from '../../config/logger';
+
+import { getEnv } from '@config/env';
+import { Logger } from '@config/logger';
 
 export class RedisClient {
   private client: Redis;
 
   constructor(private logger: Logger) {
     const env = getEnv();
-    
+
     const config: RedisOptions = {
       host: env.REDIS_HOST,
       port: env.REDIS_PORT,
@@ -63,4 +64,3 @@ export class RedisClient {
     }
   }
 }
-

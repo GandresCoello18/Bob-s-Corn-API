@@ -1,0 +1,21 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Logs
+logs/
+*.log
+
+# Coverage
+coverage/
+
+# Config files
+*.config.js
+*.config.ts
+
+# Generated files
+*.tsbuildinfo
+

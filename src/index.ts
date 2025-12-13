@@ -1,8 +1,10 @@
-import { loadEnv, getEnv } from './config/env';
-import { createLogger } from './config/logger';
-import { buildApp } from './app';
-import { PostgresClient } from './infrastructure/database/postgres';
-import { RedisClient } from './infrastructure/cache/redis';
+import { buildApp } from '@/app';
+
+import { RedisClient } from '@infrastructure/cache/redis';
+import { PostgresClient } from '@infrastructure/database/postgres';
+
+import { loadEnv, getEnv } from '@config/env';
+import { createLogger } from '@config/logger';
 
 async function start() {
   try {
@@ -41,5 +43,4 @@ async function start() {
   }
 }
 
-start();
-
+void start();

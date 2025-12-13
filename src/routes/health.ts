@@ -1,7 +1,9 @@
 import { FastifyInstance, FastifyReply } from 'fastify';
-import { PostgresClient } from '../infrastructure/database/postgres';
-import { RedisClient } from '../infrastructure/cache/redis';
-import { Logger } from '../config/logger';
+
+import { RedisClient } from '@infrastructure/cache/redis';
+import { PostgresClient } from '@infrastructure/database/postgres';
+
+import { Logger } from '@config/logger';
 
 interface HealthCheckDependencies {
   logger: Logger;
@@ -46,4 +48,3 @@ export async function healthRoutes(
     return reply.code(statusCode).send(checks);
   });
 }
-

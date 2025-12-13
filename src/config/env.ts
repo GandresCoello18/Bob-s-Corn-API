@@ -1,5 +1,6 @@
-import { config } from 'dotenv';
 import { resolve } from 'path';
+
+import { config } from 'dotenv';
 import { z } from 'zod';
 
 /**
@@ -22,16 +23,16 @@ const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   PORT: z.string().regex(/^\d+$/).transform(Number).default('3000'),
   HOST: z.string().default('0.0.0.0'),
-  
+
   // PostgreSQL
   DATABASE_URL: z.string().url(),
-  
+
   // Redis
   REDIS_HOST: z.string().default('localhost'),
   REDIS_PORT: z.string().regex(/^\d+$/).transform(Number).default('6379'),
   REDIS_PASSWORD: z.string().optional(),
   REDIS_DB: z.string().regex(/^\d+$/).transform(Number).default('0'),
-  
+
   // Logging
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
 });
@@ -50,7 +51,9 @@ export function loadEnv(): Env {
     return env;
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const missingVars = error.errors.map((err) => `${err.path.join('.')}: ${err.message}`).join('\n');
+      const missingVars = error.errors
+        .map((err) => `${err.path.join('.')}: ${err.message}`)
+        .join('\n');
       throw new Error(`Invalid environment variables:\n${missingVars}`);
     }
     throw error;
@@ -63,4 +66,3 @@ export function getEnv(): Env {
   }
   return env;
 }
-

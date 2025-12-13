@@ -1,9 +1,10 @@
 import pino from 'pino';
-import { getEnv } from './env';
+
+import { getEnv } from '@config/env';
 
 export function createLogger() {
   const env = getEnv();
-  
+
   const logger = pino({
     level: env.LOG_LEVEL,
     transport:
@@ -23,4 +24,3 @@ export function createLogger() {
 }
 
 export type Logger = ReturnType<typeof createLogger>;
-
