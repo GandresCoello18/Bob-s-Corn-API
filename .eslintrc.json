@@ -53,6 +53,7 @@
       }
     ],
     "@typescript-eslint/require-await": "warn",
+    "@typescript-eslint/no-unsafe-call": "off",
     "import/order": [
       "error",
       {

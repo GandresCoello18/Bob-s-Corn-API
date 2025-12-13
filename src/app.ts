@@ -5,6 +5,9 @@ import { healthRoutes } from '@/routes/health';
 
 import { RedisClient } from '@infrastructure/cache/redis';
 import { PostgresClient } from '@infrastructure/database/postgres';
+import { createErrorHandler } from '@infrastructure/http/error-handler';
+import { notFoundHandler } from '@infrastructure/http/not-found-handler';
+import { registerRequestLogger } from '@infrastructure/http/request-logger';
 
 import { Logger } from '@config/logger';
 
@@ -28,8 +31,17 @@ export async function buildApp(dependencies: AppDependencies): Promise<FastifyIn
     origin: true,
   });
 
+  // Register request logger middleware
+  registerRequestLogger(app, logger);
+
+  // Register error handler
+  app.setErrorHandler(createErrorHandler(logger));
+
   // Register routes
   await app.register(healthRoutes, { dependencies });
+
+  // Register 404 handler (must be last)
+  app.setNotFoundHandler(notFoundHandler);
 
   // Graceful shutdown handlers
   const shutdown = async (signal: string) => {
