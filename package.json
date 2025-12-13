@@ -7,8 +7,8 @@
   "scripts": {
     "dev": "cross-env APP_ENV=development nodemon",
     "dev:prod": "cross-env APP_ENV=production nodemon",
-    "build": "tsc",
-    "build:prod": "cross-env APP_ENV=production tsc",
+    "build": "prisma generate && tsc",
+    "build:prod": "cross-env APP_ENV=production prisma generate && tsc",
     "start": "cross-env APP_ENV=production node dist/index.js",
     "start:dev": "cross-env APP_ENV=development node dist/index.js",
     "test": "jest",
@@ -20,8 +20,15 @@
     "format:check": "prettier --check \"src/**/*.{ts,json}\"",
     "typecheck": "tsc --noEmit",
     "check": "yarn typecheck && yarn lint && yarn format:check",
-    "prepare": "husky",
-    "commitlint": "commitlint --edit"
+    "prepare": "husky && prisma generate",
+    "commitlint": "commitlint --edit",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
+    "db:migrate:reset": "prisma migrate reset",
+    "db:studio": "prisma studio",
+    "db:seed": "tsx prisma/seed.ts"
   },
   "keywords": [
     "api",
@@ -33,6 +40,7 @@
   "license": "ISC",
   "dependencies": {
     "@fastify/cors": "^9.0.1",
+    "@prisma/client": "^7.1.0",
     "dotenv": "^17.2.3",
     "fastify": "^4.26.0",
     "ioredis": "^5.3.2",
@@ -59,6 +67,7 @@
     "jest": "^29.7.0",
     "nodemon": "^3.1.11",
     "prettier": "^3.7.4",
+    "prisma": "^7.1.0",
     "ts-jest": "^29.1.1",
     "tsx": "^4.7.1",
     "typescript": "^5.3.3"

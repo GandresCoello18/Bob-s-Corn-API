@@ -36,11 +36,30 @@ src/
 
 ### Using Docker (Optional)
 
-For local development, you can use Docker to run PostgreSQL and Redis:
+For local development, you can use Docker to run PostgreSQL, Redis, and pgAdmin:
 
 ```bash
 docker-compose up -d
 ```
+
+**Services available:**
+- **PostgreSQL**: `localhost:5432`
+- **Redis**: `localhost:6379`
+- **pgAdmin** (Database GUI): `http://localhost:5050`
+  - Email: `admin@admin.com`
+  - Password: `admin`
+
+To connect to PostgreSQL from pgAdmin:
+1. Open `http://localhost:5050` in your browser
+2. Login with the credentials above
+3. Right-click "Servers" → "Register" → "Server"
+4. In the "General" tab, name it "Local PostgreSQL"
+5. In the "Connection" tab:
+   - Host: `postgres` (service name in docker-compose)
+   - Port: `5432`
+   - Username: `postgres`
+   - Password: `postgres`
+   - Database: `bobs_corn_db`
 
 ### Installation
 
