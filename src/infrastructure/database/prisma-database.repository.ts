@@ -1,9 +1,11 @@
 import { PrismaClient } from '@prisma/client';
 
+import { IDatabaseRepository } from '@domain/repositories/database-repository.interface';
+
 import { getEnv } from '@config/env';
 import { Logger } from '@config/logger';
 
-export class PrismaDatabase {
+export class PrismaDatabaseRepository implements IDatabaseRepository {
   private client: PrismaClient;
 
   constructor(private logger: Logger) {
@@ -18,14 +20,8 @@ export class PrismaDatabase {
               { level: 'warn', emit: 'stdout' },
             ]
           : [{ level: 'error', emit: 'stdout' }],
-      datasources: {
-        db: {
-          url: env.DATABASE_URL,
-        },
-      },
     });
 
-    // Log queries in development
     if (env.NODE_ENV === 'development') {
       this.client.$on(
         'query' as never,
@@ -38,7 +34,7 @@ export class PrismaDatabase {
       );
     }
 
-    this.logger.info('Prisma client initialized');
+    this.logger.info('Prisma database repository initialized');
   }
 
   async connect(): Promise<void> {
@@ -56,10 +52,6 @@ export class PrismaDatabase {
     this.logger.info('Prisma database connection closed');
   }
 
-  getClient(): PrismaClient {
-    return this.client;
-  }
-
   async healthCheck(): Promise<boolean> {
     try {
       await this.client.$queryRaw`SELECT 1`;
@@ -67,5 +59,9 @@ export class PrismaDatabase {
     } catch {
       return false;
     }
+  }
+
+  getClient(): PrismaClient {
+    return this.client;
   }
 }

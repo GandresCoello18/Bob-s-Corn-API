@@ -15,7 +15,6 @@ export function validateRequest<T = unknown>(
 ): T {
   const errors: ZodError[] = [];
 
-  // Validate body
   if (schemas.body) {
     try {
       request.body = schemas.body.parse(request.body);
@@ -26,7 +25,6 @@ export function validateRequest<T = unknown>(
     }
   }
 
-  // Validate query
   if (schemas.query) {
     try {
       request.query = schemas.query.parse(request.query);
@@ -37,7 +35,6 @@ export function validateRequest<T = unknown>(
     }
   }
 
-  // Validate params
   if (schemas.params) {
     try {
       request.params = schemas.params.parse(request.params);
@@ -49,7 +46,6 @@ export function validateRequest<T = unknown>(
   }
 
   if (errors.length > 0) {
-    // Combine all errors into a single ZodError
     const combinedErrors = errors.flatMap((err) => err.errors);
     const combinedZodError = new ZodError(combinedErrors);
     throw ValidationError.fromZodError(combinedZodError);

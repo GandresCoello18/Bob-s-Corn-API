@@ -1,33 +1,26 @@
 import { buildApp } from '@/app';
-
-import { RedisClient } from '@infrastructure/cache/redis';
-import { PostgresClient } from '@infrastructure/database/postgres';
+import { DependencyContainer } from '@/application/container/dependency-container';
 
 import { loadEnv, getEnv } from '@config/env';
 import { createLogger } from '@config/logger';
 
 async function start() {
   try {
-    // Load and validate environment variables
     loadEnv();
     const env = getEnv();
     const logger = createLogger();
 
     logger.info({ env: env.NODE_ENV }, 'Starting application');
 
-    // Initialize infrastructure
-    const postgres = new PostgresClient(logger);
-    const redis = new RedisClient(logger);
+    const container = new DependencyContainer(logger);
+    container.initializeRepositories();
+    container.initializeUseCases();
 
-    // Connect to services
-    await postgres.connect();
-    await redis.connect();
+    await container.connectAll();
 
-    // Build and start the application
     const dependencies = {
       logger,
-      postgres,
-      redis,
+      container,
     };
     const app = await buildApp(dependencies);
 

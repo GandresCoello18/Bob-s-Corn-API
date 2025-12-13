@@ -15,16 +15,33 @@ A clean, production-ready Node.js + TypeScript API built with Fastify, following
 
 ## Architecture
 
-The project follows Clean Architecture principles with clear separation of concerns:
+The project follows **Clean Architecture** principles with **Light Domain-Driven Design (DDD)**:
 
 ```
 src/
 ├── domain/          # Domain layer (entities, repository interfaces)
-├── application/     # Application layer (use cases, services)
-├── infrastructure/  # Infrastructure layer (database, cache, external services)
-├── routes/          # HTTP routes
+│   ├── entities/    # Business entities
+│   └── repositories/ # Repository contracts (interfaces)
+├── application/     # Application layer (use cases, services, DI container)
+│   ├── use-cases/   # Application use cases
+│   ├── errors/      # Application errors
+│   ├── validation/  # Validation utilities
+│   └── container/   # Dependency Injection container
+├── infrastructure/  # Infrastructure layer (database, cache, HTTP)
+│   ├── database/    # Database implementations (Prisma)
+│   ├── cache/       # Cache implementations (Redis)
+│   └── http/        # HTTP infrastructure (error handling, logging)
+├── routes/          # Presentation layer (HTTP routes)
 └── config/          # Configuration (env, logger)
 ```
+
+**Key Principles**:
+- ✅ **Dependency Inversion**: Dependencies point inward (Infrastructure → Domain)
+- ✅ **Framework Independence**: Domain layer has no framework dependencies
+- ✅ **Testability**: Each layer can be tested independently
+- ✅ **Separation of Concerns**: Clear boundaries between layers
+
+For detailed architecture documentation, see [ARCHITECTURE.md](./ARCHITECTURE.md).
 
 ## Prerequisites
 
@@ -115,6 +132,14 @@ The API will be available at `http://localhost:3000`
 - `npm run lint` - Lint the codebase
 - `npm run commitlint` - Validate commit message format
 
+### Database (Prisma)
+- `npm run db:generate` - Generate Prisma Client
+- `npm run db:push` - Push schema changes to database
+- `npm run db:migrate` - Create and apply migration
+- `npm run db:migrate:deploy` - Deploy migrations (production)
+- `npm run db:migrate:reset` - Reset database and apply migrations
+- `npm run db:studio` - Open Prisma Studio (database GUI)
+
 ### Environment Files
 
 The project uses separate environment files:
@@ -187,25 +212,41 @@ The application is designed to be deployed to Railway. Ensure that:
 
 ## Commit Convention
 
-This project follows [Conventional Commits](https://www.conventionalcommits.org/) for commit messages. All commits are automatically validated using commitlint.
+This project **requires** [Conventional Commits](https://www.conventionalcommits.org/) format. All commits are **automatically validated** and will be **rejected** if they don't follow the format.
 
-**Format:**
+**Required Format:**
 ```
 <type>(<scope>): <subject>
 
-<body>
+<body> (optional)
 
-<footer>
+<footer> (optional)
 ```
 
-**Types:** `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`
+**Valid Types:** `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`
 
-**Example:**
+**Rules:**
+- ✅ Type is **mandatory** and must be lowercase
+- ✅ Subject is **mandatory** (max 100 characters)
+- ✅ Subject must be in lowercase and imperative mood
+- ✅ No period at the end of subject
+- ✅ Scope is optional but recommended
+
+**Examples:**
 ```bash
-git commit -m "feat(infrastructure): add error handler middleware"
+# ✅ Valid commits
+git commit -m "feat: add user authentication"
+git commit -m "fix(infrastructure): resolve database connection"
+git commit -m "refactor(application): improve use case structure"
+
+# ❌ Invalid commits (will be rejected)
+git commit -m "add new feature"           # Missing type
+git commit -m "FEAT: add feature"         # Type in uppercase
+git commit -m "feat:"                     # Missing subject
+git commit -m "feat: Add feature."        # Capital letter and period
 ```
 
-For detailed information, see [COMMIT_CONVENTION.md](./COMMIT_CONVENTION.md).
+For detailed guide with examples, see [COMMIT_GUIDE.md](./COMMIT_GUIDE.md).
 
 ## License
 

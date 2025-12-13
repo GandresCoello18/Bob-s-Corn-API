@@ -21,7 +21,6 @@ export function createErrorHandler(logger: Logger) {
     request: FastifyRequest,
     reply: FastifyReply
   ): void {
-    // Handle Zod validation errors
     if (error instanceof ZodError) {
       const validationError = ValidationError.fromZodError(error);
       const response: ErrorResponse = {
@@ -40,11 +39,10 @@ export function createErrorHandler(logger: Logger) {
         'Validation error'
       );
 
-      reply.code(validationError.statusCode).send(response);
+      void reply.code(validationError.statusCode).send(response);
       return;
     }
 
-    // Handle AppError (our custom errors)
     if (error instanceof AppError) {
       const response: ErrorResponse = {
         ...error.toJSON(),
@@ -66,11 +64,10 @@ export function createErrorHandler(logger: Logger) {
         error.message
       );
 
-      reply.code(error.statusCode).send(response);
+      void reply.code(error.statusCode).send(response);
       return;
     }
 
-    // Handle Fastify errors
     if ('statusCode' in error && typeof error.statusCode === 'number') {
       const fastifyError = error;
       const response: ErrorResponse = {
@@ -93,11 +90,10 @@ export function createErrorHandler(logger: Logger) {
         'Fastify error'
       );
 
-      reply.code(fastifyError.statusCode || 500).send(response);
+      void reply.code(fastifyError.statusCode || 500).send(response);
       return;
     }
 
-    // Handle unknown errors
     const response: ErrorResponse = {
       error: {
         code: ErrorCode.INTERNAL_ERROR,

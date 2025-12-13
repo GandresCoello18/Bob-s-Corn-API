@@ -1,9 +1,11 @@
 import Redis, { RedisOptions } from 'ioredis';
 
+import { ICacheRepository } from '@domain/repositories/cache-repository.interface';
+
 import { getEnv } from '@config/env';
 import { Logger } from '@config/logger';
 
-export class RedisClient {
+export class RedisCacheRepository implements ICacheRepository {
   private client: Redis;
 
   constructor(private logger: Logger) {
@@ -51,10 +53,6 @@ export class RedisClient {
     this.logger.info('Redis connection closed');
   }
 
-  getClient(): Redis {
-    return this.client;
-  }
-
   async healthCheck(): Promise<boolean> {
     try {
       const result = await this.client.ping();
@@ -62,5 +60,9 @@ export class RedisClient {
     } catch {
       return false;
     }
+  }
+
+  getClient(): Redis {
+    return this.client;
   }
 }

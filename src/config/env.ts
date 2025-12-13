@@ -3,19 +3,12 @@ import { resolve } from 'path';
 import { config } from 'dotenv';
 import { z } from 'zod';
 
-/**
- * Determines which .env file to load based on APP_ENV or NODE_ENV
- * Priority: APP_ENV > NODE_ENV
- * Falls back to .env.dev if neither is set (for local development safety)
- */
 function getEnvFilePath(): string {
   const appEnv = process.env.APP_ENV || process.env.NODE_ENV || 'development';
   const envFile = appEnv === 'production' ? '.env.prod' : '.env.dev';
   return resolve(process.cwd(), envFile);
 }
 
-// Load environment variables from the appropriate .env file
-// Note: In production on Railway, env vars are set directly, but .env.prod can be used for local production testing
 const envFilePath = getEnvFilePath();
 config({ path: envFilePath });
 
