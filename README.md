@@ -94,6 +94,7 @@ The API will be available at `http://localhost:3000`
 - `npm run test:coverage` - Run tests with coverage report
 - `npm run typecheck` - Type check without building
 - `npm run lint` - Lint the codebase
+- `npm run commitlint` - Validate commit message format
 
 ### Environment Files
 
@@ -164,6 +165,28 @@ The application is designed to be deployed to Railway. Ensure that:
 - **Application Layer**: Use cases and orchestration logic
 - **Infrastructure Layer**: External dependencies (database, cache, APIs)
 - **Routes**: HTTP request handlers
+
+## Commit Convention
+
+This project follows [Conventional Commits](https://www.conventionalcommits.org/) for commit messages. All commits are automatically validated using commitlint.
+
+**Format:**
+```
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+```
+
+**Types:** `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`
+
+**Example:**
+```bash
+git commit -m "feat(infrastructure): add error handler middleware"
+```
+
+For detailed information, see [COMMIT_CONVENTION.md](./COMMIT_CONVENTION.md).
 
 ## License
 
