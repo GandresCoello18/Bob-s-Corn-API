@@ -17,7 +17,6 @@ export async function healthRoutes(
 
   fastify.get('/health', async (request: FastifyRequest, reply: FastifyReply) => {
     const startTime = Date.now();
-    logger.debug({ method: request.method, url: request.url }, 'Received health check request');
 
     try {
       const result = await healthCheckUseCase.execute();
@@ -25,16 +24,18 @@ export async function healthRoutes(
       const allHealthy = result.services.database && result.services.cache;
       const statusCode = allHealthy ? 200 : 503;
 
-      logger.debug(
-        {
-          method: request.method,
-          url: request.url,
-          statusCode,
-          duration: `${duration}ms`,
-          services: result.services,
-        },
-        'Health check completed'
-      );
+      if (!allHealthy) {
+        logger.warn(
+          {
+            method: request.method,
+            url: request.url,
+            statusCode,
+            duration: `${duration}ms`,
+            services: result.services,
+          },
+          'Health check failed - some services are unhealthy'
+        );
+      }
 
       return reply.code(statusCode).send(result);
     } catch (error) {
@@ -49,8 +50,6 @@ export async function healthRoutes(
         },
         'Health check request failed'
       );
-
-      // Re-throw to let error handler process it
       throw error;
     }
   });

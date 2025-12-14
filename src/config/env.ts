@@ -27,7 +27,50 @@ const envSchema = z.object({
   REDIS_DB: z.string().regex(/^\d+$/).transform(Number).default('0'),
 
   // Logging
-  LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
+  LOG_LEVEL: z
+    .enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace'])
+    .default('info')
+    .transform((val) => {
+      // Auto-adjust log level based on NODE_ENV
+      const nodeEnv = process.env.NODE_ENV || 'development';
+      if (nodeEnv === 'production' && ['debug', 'trace'].includes(val)) {
+        return 'info';
+      }
+      return val;
+    }),
+
+  // Rate Limiting
+  RATE_LIMIT_WINDOW_SECONDS: z
+    .string()
+    .regex(/^\d+$/)
+    .transform(Number)
+    .default('60')
+    .pipe(z.number().int().positive().max(3600)), // Max 1 hour
+
+  RATE_LIMIT_MAX_REQUESTS: z
+    .string()
+    .regex(/^\d+$/)
+    .transform(Number)
+    .default('1')
+    .pipe(z.number().int().positive().max(1000)), // Max 1000 requests
+
+  // Database Connection Pool
+  DB_POOL_MAX: z
+    .string()
+    .regex(/^\d+$/)
+    .transform(Number)
+    .optional()
+    .pipe(z.number().int().positive().max(100).optional()),
+
+  DB_POOL_MIN: z
+    .string()
+    .regex(/^\d+$/)
+    .transform(Number)
+    .optional()
+    .pipe(z.number().int().positive().max(50).optional()),
+
+  // CORS
+  CORS_ORIGIN: z.string().default('*'),
 });
 
 export type Env = z.infer<typeof envSchema>;

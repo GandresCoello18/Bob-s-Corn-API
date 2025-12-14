@@ -2,41 +2,63 @@ import { PrismaClient } from '@prisma/client';
 
 import { CheckRateLimitUseCase } from '@/application/use-cases/check-rate-limit.use-case';
 
+import { PurchaseStatus } from '@domain/enums/purchase-status.enum';
+
+import { RATE_LIMIT } from '@config/constants';
+import { getEnv } from '@config/env';
 import { Logger } from '@config/logger';
 
 export interface PurchaseCornResult {
-  success: true;
+  success: boolean;
   message: string;
   timestamp: string;
 }
 
 export class PurchaseCornUseCase {
+  private readonly rateLimitWindowSeconds: number;
+  private readonly rateLimitMaxRequests: number;
+  private readonly isDevelopment: boolean;
+
   constructor(
     private readonly prismaClient: PrismaClient,
     private readonly checkRateLimitUseCase: CheckRateLimitUseCase,
     private readonly logger: Logger
-  ) {}
+  ) {
+    const env = getEnv();
+    this.rateLimitWindowSeconds =
+      env.RATE_LIMIT_WINDOW_SECONDS ?? RATE_LIMIT.DEFAULT_WINDOW_SECONDS;
+    this.rateLimitMaxRequests = env.RATE_LIMIT_MAX_REQUESTS ?? RATE_LIMIT.DEFAULT_MAX_REQUESTS;
+    this.isDevelopment = env.NODE_ENV === 'development';
+  }
 
   async execute(clientIp: string): Promise<PurchaseCornResult> {
     const startTime = Date.now();
-    this.logger.info({ clientIp }, 'Starting corn purchase process');
+    if (this.isDevelopment) {
+      this.logger.info({ clientIp }, 'Starting corn purchase process');
+    }
 
     try {
-      // Check rate limit: 1 purchase per minute (60 seconds)
-      this.logger.debug({ clientIp }, 'Checking rate limit before purchase');
+      // Check rate limit using configured values
+      if (this.isDevelopment) {
+        this.logger.debug({ clientIp }, 'Checking rate limit before purchase');
+      }
       await this.checkRateLimitUseCase.execute({
         clientIp,
-        windowSeconds: 60,
-        maxRequests: 1,
+        windowSeconds: this.rateLimitWindowSeconds,
+        maxRequests: this.rateLimitMaxRequests,
       });
-      this.logger.debug({ clientIp }, 'Rate limit check passed, proceeding with purchase');
+      if (this.isDevelopment) {
+        this.logger.debug({ clientIp }, 'Rate limit check passed, proceeding with purchase');
+      }
 
       // Create purchase record
-      this.logger.debug({ clientIp }, 'Creating purchase record in database');
+      if (this.isDevelopment) {
+        this.logger.debug({ clientIp }, 'Creating purchase record in database');
+      }
       const purchase = await this.prismaClient.purchase.create({
         data: {
           clientIp,
-          status: 'success',
+          status: PurchaseStatus.SUCCESS,
           meta: {},
         },
       });

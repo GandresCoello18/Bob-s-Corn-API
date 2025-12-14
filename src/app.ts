@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
 import cors from '@fastify/cors';
+import helmet from '@fastify/helmet';
 import Fastify, { FastifyInstance } from 'fastify';
 
 import { DependencyContainer } from '@/application/container/dependency-container';
@@ -11,6 +12,8 @@ import { createErrorHandler } from '@infrastructure/http/error-handler';
 import { notFoundHandler } from '@infrastructure/http/not-found-handler';
 import { registerRequestLogger } from '@infrastructure/http/request-logger';
 
+import { HTTP } from '@config/constants';
+import { getEnv } from '@config/env';
 import { Logger } from '@config/logger';
 
 export interface AppDependencies {
@@ -20,14 +23,30 @@ export interface AppDependencies {
 
 export async function buildApp(dependencies: AppDependencies): Promise<FastifyInstance> {
   const { logger, container } = dependencies;
+  const env = getEnv();
 
   const app = Fastify({
     logger: false,
     disableRequestLogging: false,
+    bodyLimit: HTTP.BODY_LIMIT,
+    requestTimeout: HTTP.REQUEST_TIMEOUT,
+  });
+
+  await app.register(helmet, {
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'"],
+        imgSrc: ["'self'", 'data:', 'https:'],
+      },
+    },
+    crossOriginEmbedderPolicy: false,
   });
 
   await app.register(cors, {
-    origin: true,
+    origin: env.CORS_ORIGIN === '*' ? true : env.CORS_ORIGIN.split(','),
+    credentials: true,
   });
 
   registerRequestLogger(app, logger);

@@ -1,9 +1,10 @@
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@prisma/client';
-import { Pool } from 'pg';
+import { Pool, PoolConfig } from 'pg';
 
 import { IDatabaseRepository } from '@domain/repositories/database-repository.interface';
 
+import { DATABASE } from '@config/constants';
 import { getEnv } from '@config/env';
 import { Logger } from '@config/logger';
 
@@ -14,27 +15,30 @@ export class PrismaDatabaseRepository implements IDatabaseRepository {
   constructor(private logger: Logger) {
     const env = getEnv();
 
-    // Create pg pool
-    this.pool = new Pool({
+    const poolConfig: PoolConfig = {
       connectionString: env.DATABASE_URL,
-    });
+      max: env.DB_POOL_MAX ?? DATABASE.POOL.MAX_CONNECTIONS,
+      min: env.DB_POOL_MIN ?? DATABASE.POOL.MIN_CONNECTIONS,
+      idleTimeoutMillis: DATABASE.POOL.IDLE_TIMEOUT,
+      connectionTimeoutMillis: DATABASE.POOL.CONNECTION_TIMEOUT,
+    };
 
-    // Create Prisma adapter
+    this.pool = new Pool(poolConfig);
     const adapter = new PrismaPg(this.pool);
+    const isDevelopment = env.NODE_ENV === 'development';
 
     this.client = new PrismaClient({
       adapter,
-      log:
-        env.NODE_ENV === 'development'
-          ? [
-              { level: 'query', emit: 'event' },
-              { level: 'error', emit: 'stdout' },
-              { level: 'warn', emit: 'stdout' },
-            ]
-          : [{ level: 'error', emit: 'stdout' }],
+      log: isDevelopment
+        ? [
+            { level: 'query', emit: 'event' },
+            { level: 'error', emit: 'stdout' },
+            { level: 'warn', emit: 'stdout' },
+          ]
+        : [{ level: 'error', emit: 'stdout' }],
     });
 
-    if (env.NODE_ENV === 'development') {
+    if (isDevelopment) {
       this.client.$on(
         'query' as never,
         (e: { query: string; params: string; duration: number }) => {
@@ -46,7 +50,13 @@ export class PrismaDatabaseRepository implements IDatabaseRepository {
       );
     }
 
-    this.logger.info('Prisma database repository initialized');
+    this.logger.info(
+      {
+        maxConnections: poolConfig.max,
+        minConnections: poolConfig.min,
+      },
+      'Prisma database repository initialized'
+    );
   }
 
   async connect(): Promise<void> {

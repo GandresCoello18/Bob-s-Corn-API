@@ -21,8 +21,6 @@ export class HealthCheckUseCase {
   ) {}
 
   async execute(): Promise<HealthCheckResult> {
-    this.logger.debug('Starting health check for all services');
-
     const checks = {
       status: 'ok' as const,
       timestamp: new Date().toISOString(),
@@ -33,13 +31,10 @@ export class HealthCheckUseCase {
       },
     };
 
-    // Check database
-    this.logger.debug('Checking database health');
+    // Check database - only log errors, not debug info
     try {
       checks.services.database = await this.databaseRepository.healthCheck();
-      if (checks.services.database) {
-        this.logger.debug('Database health check passed');
-      } else {
+      if (!checks.services.database) {
         this.logger.warn('Database health check returned false');
       }
     } catch (err) {
@@ -47,13 +42,10 @@ export class HealthCheckUseCase {
       checks.services.database = false;
     }
 
-    // Check cache
-    this.logger.debug('Checking cache health');
+    // Check cache - only log errors, not debug info
     try {
       checks.services.cache = await this.cacheRepository.healthCheck();
-      if (checks.services.cache) {
-        this.logger.debug('Cache health check passed');
-      } else {
+      if (!checks.services.cache) {
         this.logger.warn('Cache health check returned false');
       }
     } catch (err) {
@@ -62,15 +54,8 @@ export class HealthCheckUseCase {
     }
 
     const allHealthy = checks.services.database && checks.services.cache;
-    if (allHealthy) {
-      this.logger.info(
-        {
-          uptime: checks.uptime,
-          services: checks.services,
-        },
-        'All services are healthy'
-      );
-    } else {
+    // Only log warnings when services are unhealthy (reduce log noise in production)
+    if (!allHealthy) {
       this.logger.warn(
         {
           uptime: checks.uptime,

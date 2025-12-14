@@ -1,4 +1,4 @@
-import { AppError, BadRequestError, NotFoundError, ValidationError } from './app-error';
+import { AppError, BadRequestError, NotFoundError, ValidationError } from '@/application/errors/app-error';
 import { ZodError } from 'zod';
 
 describe('AppError', () => {
@@ -57,3 +57,4 @@ describe('AppError', () => {
     expect(error.statusCode).toBe(404);
   });
 });
+

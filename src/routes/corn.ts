@@ -1,7 +1,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 
-import { PurchaseCornUseCase } from '@/application/use-cases/purchase-corn.use-case';
 import { TooManyRequestsError } from '@/application/errors/app-error';
+import { PurchaseCornUseCase } from '@/application/use-cases/purchase-corn.use-case';
 
 import { Logger } from '@config/logger';
 
@@ -18,7 +18,6 @@ export async function cornRoutes(
 
   fastify.post('/corn', async (request: FastifyRequest, reply: FastifyReply) => {
     const startTime = Date.now();
-    // Extract client IP address
     const clientIp = request.ip || 'unknown';
 
     logger.info(
@@ -78,8 +77,6 @@ export async function cornRoutes(
           'Corn purchase request failed'
         );
       }
-
-      // Re-throw to let error handler process it
       throw error;
     }
   });

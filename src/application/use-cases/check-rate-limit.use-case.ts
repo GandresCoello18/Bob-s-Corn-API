@@ -2,6 +2,7 @@ import { TooManyRequestsError } from '@/application/errors/app-error';
 
 import { IRateLimiterRepository } from '@domain/repositories/rate-limiter-repository.interface';
 
+import { getEnv } from '@config/env';
 import { Logger } from '@config/logger';
 
 export interface CheckRateLimitInput {
@@ -11,15 +12,22 @@ export interface CheckRateLimitInput {
 }
 
 export class CheckRateLimitUseCase {
+  private readonly isDevelopment: boolean;
+
   constructor(
     private readonly rateLimiterRepository: IRateLimiterRepository,
     private readonly logger: Logger
-  ) {}
+  ) {
+    const env = getEnv();
+    this.isDevelopment = env.NODE_ENV === 'development';
+  }
 
   async execute(input: CheckRateLimitInput): Promise<void> {
     const { clientIp, windowSeconds, maxRequests } = input;
 
-    this.logger.debug({ clientIp, windowSeconds, maxRequests }, 'Checking rate limit for client');
+    if (this.isDevelopment) {
+      this.logger.debug({ clientIp, windowSeconds, maxRequests }, 'Checking rate limit for client');
+    }
 
     const isLimited = await this.rateLimiterRepository.isRateLimited(
       clientIp,
@@ -39,17 +47,21 @@ export class CheckRateLimitUseCase {
       throw new TooManyRequestsError('Too many requests. Maximum 1 purchase per minute allowed.');
     }
 
-    this.logger.debug(
-      {
-        clientIp,
-        windowSeconds,
-        maxRequests,
-      },
-      'Rate limit check passed for client'
-    );
+    if (this.isDevelopment) {
+      this.logger.debug(
+        {
+          clientIp,
+          windowSeconds,
+          maxRequests,
+        },
+        'Rate limit check passed for client'
+      );
+    }
 
     // Record the request after checking (if not limited)
     await this.rateLimiterRepository.recordRequest(clientIp, windowSeconds);
-    this.logger.debug({ clientIp }, 'Request recorded in rate limiter');
+    if (this.isDevelopment) {
+      this.logger.debug({ clientIp }, 'Request recorded in rate limiter');
+    }
   }
 }

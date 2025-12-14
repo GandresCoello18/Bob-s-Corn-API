@@ -2,6 +2,7 @@ import Redis, { RedisOptions } from 'ioredis';
 
 import { ICacheRepository } from '@domain/repositories/cache-repository.interface';
 
+import { REDIS } from '@config/constants';
 import { getEnv } from '@config/env';
 import { Logger } from '@config/logger';
 
@@ -17,10 +18,10 @@ export class RedisCacheRepository implements ICacheRepository {
       password: env.REDIS_PASSWORD || undefined,
       db: env.REDIS_DB,
       retryStrategy: (times: number) => {
-        const delay = Math.min(times * 50, 2000);
+        const delay = Math.min(times * REDIS.RETRY_DELAY, REDIS.MAX_RETRY_DELAY);
         return delay;
       },
-      maxRetriesPerRequest: 3,
+      maxRetriesPerRequest: REDIS.MAX_RETRIES_PER_REQUEST,
     };
 
     this.client = new Redis(config);
