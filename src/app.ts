@@ -40,6 +40,7 @@ export async function buildApp(dependencies: AppDependencies): Promise<FastifyIn
     prefix: '/api/v001',
     dependencies: {
       healthCheckUseCase,
+      logger,
     },
   });
 
@@ -47,6 +48,7 @@ export async function buildApp(dependencies: AppDependencies): Promise<FastifyIn
     prefix: '/api/v001',
     dependencies: {
       purchaseCornUseCase,
+      logger,
     },
   });
 

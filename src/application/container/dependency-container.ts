@@ -1,17 +1,21 @@
 import { ICacheRepository } from '@domain/repositories/cache-repository.interface';
 import { IDatabaseRepository } from '@domain/repositories/database-repository.interface';
+import { IRateLimiterRepository } from '@domain/repositories/rate-limiter-repository.interface';
 
 import { RedisCacheRepository } from '@infrastructure/cache/redis-cache.repository';
+import { RedisRateLimiterRepository } from '@infrastructure/cache/redis-rate-limiter.repository';
 import { PrismaDatabaseRepository } from '@infrastructure/database/prisma-database.repository';
 
 import { Logger } from '@config/logger';
 
+import { CheckRateLimitUseCase } from '../use-cases/check-rate-limit.use-case';
 import { HealthCheckUseCase } from '../use-cases/health-check.use-case';
 import { PurchaseCornUseCase } from '../use-cases/purchase-corn.use-case';
 
 export class DependencyContainer {
   private databaseRepository: IDatabaseRepository | null = null;
   private cacheRepository: ICacheRepository | null = null;
+  private rateLimiterRepository: IRateLimiterRepository | null = null;
   private healthCheckUseCase: HealthCheckUseCase | null = null;
   private purchaseCornUseCase: PurchaseCornUseCase | null = null;
 
@@ -20,10 +24,13 @@ export class DependencyContainer {
   initializeRepositories(): void {
     this.databaseRepository = new PrismaDatabaseRepository(this.logger);
     this.cacheRepository = new RedisCacheRepository(this.logger);
+
+    const redisClient = (this.cacheRepository as RedisCacheRepository).getClient();
+    this.rateLimiterRepository = new RedisRateLimiterRepository(redisClient, this.logger);
   }
 
   initializeUseCases(): void {
-    if (!this.databaseRepository || !this.cacheRepository) {
+    if (!this.databaseRepository || !this.cacheRepository || !this.rateLimiterRepository) {
       throw new Error('Repositories must be initialized before use cases');
     }
 
@@ -35,7 +42,18 @@ export class DependencyContainer {
 
     // Get PrismaClient from PrismaDatabaseRepository for use cases that need direct DB access
     const prismaClient = (this.databaseRepository as PrismaDatabaseRepository).getClient();
-    this.purchaseCornUseCase = new PurchaseCornUseCase(prismaClient, this.logger);
+
+    // Initialize rate limiter use case
+    const checkRateLimitUseCase = new CheckRateLimitUseCase(
+      this.rateLimiterRepository,
+      this.logger
+    );
+
+    this.purchaseCornUseCase = new PurchaseCornUseCase(
+      prismaClient,
+      checkRateLimitUseCase,
+      this.logger
+    );
   }
 
   getDatabaseRepository(): IDatabaseRepository {

@@ -8,6 +8,7 @@ export enum ErrorCode {
   NOT_FOUND = 'NOT_FOUND',
   CONFLICT = 'CONFLICT',
   VALIDATION_ERROR = 'VALIDATION_ERROR',
+  TOO_MANY_REQUESTS = 'TOO_MANY_REQUESTS',
 
   // Server errors (5xx)
   INTERNAL_ERROR = 'INTERNAL_ERROR',
@@ -92,6 +93,13 @@ export class ValidationError extends AppError {
     }));
 
     return new ValidationError('Validation failed', details);
+  }
+}
+
+export class TooManyRequestsError extends AppError {
+  constructor(message: string, details?: unknown) {
+    super(ErrorCode.TOO_MANY_REQUESTS, message, 429, details);
+    this.name = 'TooManyRequestsError';
   }
 }
 

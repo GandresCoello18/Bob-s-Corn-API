@@ -65,6 +65,9 @@ docker-compose up -d
 - **pgAdmin** (Database GUI): `http://localhost:5050`
   - Email: `admin@admin.com`
   - Password: `admin`
+- **Redis Commander** (Redis GUI): `http://localhost:8081`
+  - Username: `admin`
+  - Password: `admin`
 
 To connect to PostgreSQL from pgAdmin:
 1. Open `http://localhost:5050` in your browser
@@ -77,6 +80,13 @@ To connect to PostgreSQL from pgAdmin:
    - Username: `postgres`
    - Password: `postgres`
    - Database: `bobs_corn_db`
+
+To view Redis data with Redis Commander:
+1. Open `http://localhost:8081` in your browser
+2. Login with username `admin` and password `admin`
+3. The Redis instance should already be configured (local connection)
+4. You can browse keys, view values, and monitor rate limiting data
+   - Rate limiting keys: `rate_limit:purchase:*` (e.g., `rate_limit:purchase:127.0.0.1`)
 
 ### Installation
 
