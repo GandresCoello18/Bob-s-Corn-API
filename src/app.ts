@@ -1,7 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
 import cors from '@fastify/cors';
 import Fastify, { FastifyInstance } from 'fastify';
 
 import { DependencyContainer } from '@/application/container/dependency-container';
+import { PurchaseCornUseCase } from '@/application/use-cases/purchase-corn.use-case';
+import { cornRoutes } from '@/routes/corn';
 import { healthRoutes } from '@/routes/health';
 
 import { createErrorHandler } from '@infrastructure/http/error-handler';
@@ -30,9 +33,20 @@ export async function buildApp(dependencies: AppDependencies): Promise<FastifyIn
   registerRequestLogger(app, logger);
   app.setErrorHandler(createErrorHandler(logger));
 
+  const healthCheckUseCase = container.getHealthCheckUseCase();
+  const purchaseCornUseCase = container.getPurchaseCornUseCase() as PurchaseCornUseCase;
+
   await app.register(healthRoutes, {
+    prefix: '/api/v001',
     dependencies: {
-      healthCheckUseCase: container.getHealthCheckUseCase(),
+      healthCheckUseCase,
+    },
+  });
+
+  await app.register(cornRoutes, {
+    prefix: '/api/v001',
+    dependencies: {
+      purchaseCornUseCase,
     },
   });
 

@@ -1,4 +1,6 @@
+import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@prisma/client';
+import { Pool } from 'pg';
 
 import { IDatabaseRepository } from '@domain/repositories/database-repository.interface';
 
@@ -7,11 +9,21 @@ import { Logger } from '@config/logger';
 
 export class PrismaDatabaseRepository implements IDatabaseRepository {
   private client: PrismaClient;
+  private pool: Pool;
 
   constructor(private logger: Logger) {
     const env = getEnv();
 
+    // Create pg pool
+    this.pool = new Pool({
+      connectionString: env.DATABASE_URL,
+    });
+
+    // Create Prisma adapter
+    const adapter = new PrismaPg(this.pool);
+
     this.client = new PrismaClient({
+      adapter,
       log:
         env.NODE_ENV === 'development'
           ? [
@@ -49,6 +61,7 @@ export class PrismaDatabaseRepository implements IDatabaseRepository {
 
   async disconnect(): Promise<void> {
     await this.client.$disconnect();
+    await this.pool.end();
     this.logger.info('Prisma database connection closed');
   }
 

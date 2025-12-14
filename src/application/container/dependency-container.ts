@@ -7,11 +7,13 @@ import { PrismaDatabaseRepository } from '@infrastructure/database/prisma-databa
 import { Logger } from '@config/logger';
 
 import { HealthCheckUseCase } from '../use-cases/health-check.use-case';
+import { PurchaseCornUseCase } from '../use-cases/purchase-corn.use-case';
 
 export class DependencyContainer {
   private databaseRepository: IDatabaseRepository | null = null;
   private cacheRepository: ICacheRepository | null = null;
   private healthCheckUseCase: HealthCheckUseCase | null = null;
+  private purchaseCornUseCase: PurchaseCornUseCase | null = null;
 
   constructor(private logger: Logger) {}
 
@@ -30,6 +32,10 @@ export class DependencyContainer {
       this.cacheRepository,
       this.logger
     );
+
+    // Get PrismaClient from PrismaDatabaseRepository for use cases that need direct DB access
+    const prismaClient = (this.databaseRepository as PrismaDatabaseRepository).getClient();
+    this.purchaseCornUseCase = new PurchaseCornUseCase(prismaClient, this.logger);
   }
 
   getDatabaseRepository(): IDatabaseRepository {
@@ -51,6 +57,13 @@ export class DependencyContainer {
       throw new Error('Health check use case not initialized');
     }
     return this.healthCheckUseCase;
+  }
+
+  getPurchaseCornUseCase(): PurchaseCornUseCase {
+    if (!this.purchaseCornUseCase) {
+      throw new Error('Purchase corn use case not initialized');
+    }
+    return this.purchaseCornUseCase;
   }
 
   async connectAll(): Promise<void> {

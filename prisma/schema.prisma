@@ -8,3 +8,14 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model Purchase {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  clientIp  String   @map("client_ip") @db.Text
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  status    String   @db.Text // "success", "rate_limited", "failed"
+  meta      Json?    @default("{}") @db.JsonB
+
+  @@index([clientIp, createdAt(sort: Desc)], map: "idx_purchases_client_ip_created_at")
+  @@map("purchases")
+}

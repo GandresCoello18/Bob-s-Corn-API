@@ -47,9 +47,7 @@ describe('AppError', () => {
     expect(error).toBeInstanceOf(ValidationError);
     expect(error.statusCode).toBe(422);
     expect(error.message).toBe('Validation failed');
-    expect(error.details).toEqual([
-      { path: 'email', message: 'Expected string, received number' },
-    ]);
+    expect(error.details).toEqual([{ path: 'email', message: 'Expected string, received number' }]);
   });
 
   it('should create NotFoundError with default message', () => {
@@ -59,4 +57,3 @@ describe('AppError', () => {
     expect(error.statusCode).toBe(404);
   });
 });
-
