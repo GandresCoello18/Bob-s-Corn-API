@@ -7,6 +7,7 @@ import { DependencyContainer } from '@/application/container/dependency-containe
 import { PurchaseCornUseCase } from '@/application/use-cases/purchase-corn.use-case';
 import { cornRoutes } from '@/routes/corn';
 import { healthRoutes } from '@/routes/health';
+import { purchasesRoutes } from '@/routes/purchases';
 
 import { createErrorHandler } from '@infrastructure/http/error-handler';
 import { notFoundHandler } from '@infrastructure/http/not-found-handler';
@@ -15,6 +16,8 @@ import { registerRequestLogger } from '@infrastructure/http/request-logger';
 import { HTTP } from '@config/constants';
 import { getEnv } from '@config/env';
 import { Logger } from '@config/logger';
+
+import { GetPurchasesUseCase } from './application/use-cases/get-purchases.use-case';
 
 export interface AppDependencies {
   logger: Logger;
@@ -54,6 +57,7 @@ export async function buildApp(dependencies: AppDependencies): Promise<FastifyIn
 
   const healthCheckUseCase = container.getHealthCheckUseCase();
   const purchaseCornUseCase = container.getPurchaseCornUseCase() as PurchaseCornUseCase;
+  const getPurchasesUseCase = container.getGetPurchasesUseCase() as GetPurchasesUseCase;
 
   await app.register(healthRoutes, {
     prefix: '/api/v001',
@@ -67,6 +71,14 @@ export async function buildApp(dependencies: AppDependencies): Promise<FastifyIn
     prefix: '/api/v001',
     dependencies: {
       purchaseCornUseCase,
+      logger,
+    },
+  });
+
+  await app.register(purchasesRoutes, {
+    prefix: '/api/v001',
+    dependencies: {
+      getPurchasesUseCase,
       logger,
     },
   });

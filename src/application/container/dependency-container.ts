@@ -9,6 +9,7 @@ import { PrismaDatabaseRepository } from '@infrastructure/database/prisma-databa
 import { Logger } from '@config/logger';
 
 import { CheckRateLimitUseCase } from '../use-cases/check-rate-limit.use-case';
+import { GetPurchasesUseCase } from '../use-cases/get-purchases.use-case';
 import { HealthCheckUseCase } from '../use-cases/health-check.use-case';
 import { PurchaseCornUseCase } from '../use-cases/purchase-corn.use-case';
 
@@ -18,6 +19,7 @@ export class DependencyContainer {
   private rateLimiterRepository: IRateLimiterRepository | null = null;
   private healthCheckUseCase: HealthCheckUseCase | null = null;
   private purchaseCornUseCase: PurchaseCornUseCase | null = null;
+  private getPurchasesUseCase: GetPurchasesUseCase | null = null;
 
   constructor(private logger: Logger) {}
 
@@ -54,6 +56,8 @@ export class DependencyContainer {
       checkRateLimitUseCase,
       this.logger
     );
+
+    this.getPurchasesUseCase = new GetPurchasesUseCase(prismaClient, this.logger);
   }
 
   getDatabaseRepository(): IDatabaseRepository {
@@ -82,6 +86,13 @@ export class DependencyContainer {
       throw new Error('Purchase corn use case not initialized');
     }
     return this.purchaseCornUseCase;
+  }
+
+  getGetPurchasesUseCase(): GetPurchasesUseCase {
+    if (!this.getPurchasesUseCase) {
+      throw new Error('Get purchases use case not initialized');
+    }
+    return this.getPurchasesUseCase;
   }
 
   async connectAll(): Promise<void> {
