@@ -112,6 +112,33 @@
       }
     ]
   },
-  "ignorePatterns": ["dist/", "node_modules/", "*.js", "coverage/", "**/*.test.ts", "**/*.spec.ts"]
+  "ignorePatterns": ["dist/", "node_modules/", "*.js", "coverage/"],
+  "overrides": [
+    {
+      "files": ["__tests__/**/*.ts", "__tests__/**/*.tsx"],
+      "parserOptions": {
+        "project": ["./tsconfig.json", "./tsconfig.test.json"]
+      },
+      "settings": {
+        "import/resolver": {
+          "typescript": {
+            "alwaysTryTypes": true,
+            "project": "./tsconfig.test.json"
+          }
+        }
+      },
+      "rules": {
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-unsafe-assignment": "off",
+        "@typescript-eslint/no-unsafe-member-access": "off",
+        "@typescript-eslint/no-unsafe-call": "off",
+        "@typescript-eslint/no-unsafe-return": "off",
+        "@typescript-eslint/no-unsafe-argument": "off",
+        "@typescript-eslint/require-await": "off",
+        "@typescript-eslint/unbound-method": "off",
+        "import/no-unresolved": "off"
+      }
+    }
+  ]
 }
 

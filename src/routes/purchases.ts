@@ -2,8 +2,9 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { z } from 'zod';
 
 import { GetPurchasesUseCase } from '@/application/use-cases/get-purchases.use-case';
-import { PurchaseStatus } from '@domain/enums/purchase-status.enum';
 import { validateRequest } from '@/application/validation/validator';
+
+import { PurchaseStatus } from '@domain/enums/purchase-status.enum';
 
 import { Logger } from '@config/logger';
 
@@ -34,10 +35,8 @@ export async function purchasesRoutes(
 
   fastify.get('/purchases', async (request: FastifyRequest, reply: FastifyReply) => {
     const startTime = Date.now();
-    // Extract client IP address
-    const clientIp = request.ip || 'unknown'; // TODO: Implement proper IP extraction with X-Forwarded-For support
+    const clientIp = request.ip || 'unknown';
 
-    // Validate query parameters
     validateRequest<GetPurchasesQuery>(request, {
       query: getPurchasesQuerySchema,
     });
