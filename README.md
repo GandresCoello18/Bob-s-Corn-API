@@ -13,6 +13,9 @@ Este proyecto sigue los principios de **Clean Architecture**, organizando el có
 - **Infrastructure**: Implementaciones técnicas (bases de datos, cache, HTTP)
 - **Presentation**: Handlers y rutas HTTP
 
+- ![arquitecture](https://github.com/user-attachments/assets/81397599-6609-4480-b05d-474989099a9e)
+
+
 Esta estructura garantiza separación de responsabilidades, testabilidad, mantenibilidad y la independencia del código de negocio respecto a frameworks y tecnologías externas.
 
 ## Stack Tecnológico
