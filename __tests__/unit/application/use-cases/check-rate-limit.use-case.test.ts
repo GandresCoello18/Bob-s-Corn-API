@@ -1,5 +1,5 @@
 import { TooManyRequestsError } from '@/application/errors/app-error';
-import { CheckRateLimitUseCase } from '@/application/use-cases/check-rate-limit.use-case';
+import { CheckRateLimitUseCase } from '@/application/use-cases/check-rate-limit/check-rate-limit.use-case';
 
 import { IRateLimiterRepository } from '@domain/repositories/rate-limiter-repository.interface';
 

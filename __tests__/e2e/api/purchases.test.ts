@@ -1,16 +1,26 @@
+import { FastifyInstance } from 'fastify';
+
 import { buildApp } from '@/app';
 import { DependencyContainer } from '@/application/container/dependency-container';
-import { GetPurchasesUseCase } from '@/application/use-cases/get-purchases.use-case';
+import { CheckRateLimitUseCase } from '@/application/use-cases/check-rate-limit/check-rate-limit.use-case';
+import { GetPurchasesUseCase } from '@/application/use-cases/get-purchases/get-purchases.use-case';
+import { HealthCheckUseCase } from '@/application/use-cases/health-check/health-check.use-case';
+import { PurchaseCornUseCase } from '@/application/use-cases/purchase-corn/purchase-corn.use-case';
 
 import { PurchaseStatus } from '@domain/enums/purchase-status.enum';
 
 import { createLogger } from '@config/logger';
 
-import { createMockLogger, createMockPrismaClient } from '../../helpers/mocks';
+import {
+  createMockLogger,
+  createMockPrismaClient,
+  createMockRateLimiterRepository,
+} from '../../helpers/mocks';
 
-describe('E2E: GET /api/v001/purchases', () => {
-  let app: any;
+describe('E2E: /api/v001/purchases', () => {
+  let app: FastifyInstance;
   let mockPrismaClient: ReturnType<typeof createMockPrismaClient>;
+  let mockRateLimiterRepository: ReturnType<typeof createMockRateLimiterRepository>;
 
   const mockClientIp = '127.0.0.1';
   const mockPurchases = [
@@ -32,19 +42,36 @@ describe('E2E: GET /api/v001/purchases', () => {
 
   beforeEach(async () => {
     mockPrismaClient = createMockPrismaClient();
+    mockRateLimiterRepository = createMockRateLimiterRepository();
     const mockLogger = createMockLogger();
 
+    mockRateLimiterRepository.isRateLimited.mockResolvedValue(false);
+    mockRateLimiterRepository.recordRequest.mockResolvedValue(undefined);
     (mockPrismaClient.purchase.findMany as jest.Mock).mockResolvedValue(mockPurchases);
     (mockPrismaClient.purchase.count as jest.Mock).mockResolvedValue(2);
+    (mockPrismaClient.purchase.create as jest.Mock).mockResolvedValue({
+      id: 'test-purchase-id',
+      clientIp: mockClientIp,
+      status: 'success',
+      createdAt: new Date(),
+      meta: {},
+    });
+
+    const checkRateLimitUseCase = new CheckRateLimitUseCase(
+      mockRateLimiterRepository as any,
+      mockLogger as any
+    );
+
+    const purchaseCornUseCase = new PurchaseCornUseCase(
+      mockPrismaClient,
+      checkRateLimitUseCase,
+      mockLogger as any
+    );
 
     const getPurchasesUseCase = new GetPurchasesUseCase(mockPrismaClient, mockLogger as any);
 
     const logger = createLogger();
     const container = new DependencyContainer(logger);
-
-    const mockPurchaseCornUseCase = {
-      execute: jest.fn(),
-    } as unknown as any;
 
     const mockHealthCheckUseCase = {
       execute: jest.fn().mockResolvedValue({
@@ -53,10 +80,10 @@ describe('E2E: GET /api/v001/purchases', () => {
         uptime: 0,
         services: { database: true, cache: true },
       }),
-    } as unknown as any;
+    } as unknown as HealthCheckUseCase;
 
     jest.spyOn(container, 'getGetPurchasesUseCase').mockReturnValue(getPurchasesUseCase);
-    jest.spyOn(container, 'getPurchaseCornUseCase').mockReturnValue(mockPurchaseCornUseCase);
+    jest.spyOn(container, 'getPurchaseCornUseCase').mockReturnValue(purchaseCornUseCase);
     jest.spyOn(container, 'getHealthCheckUseCase').mockReturnValue(mockHealthCheckUseCase);
 
     app = await buildApp({
@@ -70,6 +97,56 @@ describe('E2E: GET /api/v001/purchases', () => {
   afterEach(async () => {
     await app.close();
     jest.clearAllMocks();
+  });
+
+  describe('POST /api/v001/purchases', () => {
+    it('should successfully create a purchase', async () => {
+      const response = await app.inject({
+        method: 'POST',
+        url: '/api/v001/purchases',
+        headers: {
+          'x-forwarded-for': mockClientIp,
+        },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = JSON.parse(response.body);
+      expect(body.success).toBe(true);
+      expect(body.message).toContain('Corn purchased successfully');
+      expect(body.timestamp).toBeDefined();
+      expect(mockPrismaClient.purchase.create).toHaveBeenCalled();
+    });
+
+    it('should return 429 when rate limit is exceeded', async () => {
+      mockRateLimiterRepository.isRateLimited.mockResolvedValue(true);
+
+      const response = await app.inject({
+        method: 'POST',
+        url: '/api/v001/purchases',
+        headers: {
+          'x-forwarded-for': mockClientIp,
+        },
+      });
+
+      expect(response.statusCode).toBe(429);
+      const body = JSON.parse(response.body);
+      expect(body.error.code).toBe('TOO_MANY_REQUESTS');
+      expect(body.error.message).toContain('Too many requests');
+      expect(mockPrismaClient.purchase.create).not.toHaveBeenCalled();
+    });
+
+    it('should extract client IP from request', async () => {
+      const testIp = '192.168.1.1';
+      await app.inject({
+        method: 'POST',
+        url: '/api/v001/purchases',
+        headers: {
+          'x-forwarded-for': testIp,
+        },
+      });
+
+      expect(mockRateLimiterRepository.isRateLimited).toHaveBeenCalled();
+    });
   });
 
   describe('GET /api/v001/purchases', () => {

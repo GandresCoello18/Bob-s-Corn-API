@@ -1,4 +1,4 @@
-import { HealthCheckUseCase } from '@/application/use-cases/health-check.use-case';
+import { HealthCheckUseCase } from '@/application/use-cases/health-check/health-check.use-case';
 
 import { ICacheRepository } from '@domain/repositories/cache-repository.interface';
 import { IDatabaseRepository } from '@domain/repositories/database-repository.interface';

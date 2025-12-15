@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 
-import { GetPurchasesUseCase } from '@/application/use-cases/get-purchases.use-case';
+import { GetPurchasesUseCase } from '@/application/use-cases/get-purchases/get-purchases.use-case';
 
 import { PurchaseStatus } from '@domain/enums/purchase-status.enum';
 

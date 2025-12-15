@@ -1,6 +1,6 @@
 import { buildApp } from '@/app';
 import { DependencyContainer } from '@/application/container/dependency-container';
-import { HealthCheckUseCase } from '@/application/use-cases/health-check.use-case';
+import { HealthCheckUseCase } from '@/application/use-cases/health-check/health-check.use-case';
 
 import { createLogger } from '@config/logger';
 

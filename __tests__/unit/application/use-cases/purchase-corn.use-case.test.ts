@@ -1,8 +1,8 @@
 import { PrismaClient } from '@prisma/client';
 
 import { TooManyRequestsError } from '@/application/errors/app-error';
-import { CheckRateLimitUseCase } from '@/application/use-cases/check-rate-limit.use-case';
-import { PurchaseCornUseCase } from '@/application/use-cases/purchase-corn.use-case';
+import { CheckRateLimitUseCase } from '@/application/use-cases/check-rate-limit/check-rate-limit.use-case';
+import { PurchaseCornUseCase } from '@/application/use-cases/purchase-corn/purchase-corn.use-case';
 
 import { PurchaseStatus } from '@domain/enums/purchase-status.enum';
 
