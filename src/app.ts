@@ -4,8 +4,8 @@ import helmet from '@fastify/helmet';
 import Fastify, { FastifyInstance } from 'fastify';
 
 import { DependencyContainer } from '@/application/container/dependency-container';
-import { PurchaseCornUseCase } from '@/application/use-cases/purchase-corn.use-case';
-import { cornRoutes } from '@/routes/corn';
+import { GetPurchasesUseCase } from '@/application/use-cases/get-purchases/get-purchases.use-case';
+import { PurchaseCornUseCase } from '@/application/use-cases/purchase-corn/purchase-corn.use-case';
 import { healthRoutes } from '@/routes/health';
 import { purchasesRoutes } from '@/routes/purchases';
 
@@ -16,8 +16,6 @@ import { registerRequestLogger } from '@infrastructure/http/request-logger';
 import { HTTP } from '@config/constants';
 import { getEnv } from '@config/env';
 import { Logger } from '@config/logger';
-
-import { GetPurchasesUseCase } from './application/use-cases/get-purchases.use-case';
 
 export interface AppDependencies {
   logger: Logger;
@@ -67,18 +65,11 @@ export async function buildApp(dependencies: AppDependencies): Promise<FastifyIn
     },
   });
 
-  await app.register(cornRoutes, {
-    prefix: '/api/v001',
-    dependencies: {
-      purchaseCornUseCase,
-      logger,
-    },
-  });
-
   await app.register(purchasesRoutes, {
     prefix: '/api/v001',
     dependencies: {
       getPurchasesUseCase,
+      purchaseCornUseCase,
       logger,
     },
   });

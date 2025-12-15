@@ -4,7 +4,6 @@ import { Logger } from '@config/logger';
 
 export function registerRequestLogger(app: FastifyInstance, logger: Logger): void {
   app.addHook('onRequest', (request: FastifyRequest, _reply: FastifyReply, done) => {
-    // Store start time in request context
     (request as FastifyRequest & { startTime?: number }).startTime = Date.now();
     done();
   });
