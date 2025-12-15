@@ -88,4 +88,22 @@ export class PurchaseCornUseCase {
       throw error;
     }
   }
+
+  async recordRateLimitedPurchase(clientIp: string): Promise<void> {
+    try {
+      await this.prismaClient.purchase.create({
+        data: {
+          clientIp,
+          status: PurchaseStatus.RATE_LIMITED,
+          meta: {},
+        },
+      });
+      if (this.isDevelopment) {
+        this.logger.debug({ clientIp }, 'Rate limited purchase recorded');
+      }
+    } catch (err) {
+      this.logger.error({ err, clientIp }, 'Error recording rate limited purchase');
+      // Don't throw - we still want to return 429 even if DB write fails
+    }
+  }
 }

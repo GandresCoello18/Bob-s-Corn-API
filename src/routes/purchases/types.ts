@@ -3,9 +3,6 @@ import { PurchaseCornUseCase } from '@/application/use-cases/purchase-corn/purch
 
 import { Logger } from '@config/logger';
 
-/**
- * Dependencies required by purchases routes
- */
 export interface PurchasesRoutesDependencies {
   getPurchasesUseCase: GetPurchasesUseCase;
   purchaseCornUseCase: PurchaseCornUseCase;

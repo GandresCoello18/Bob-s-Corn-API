@@ -9,6 +9,7 @@ export async function purchasesRoutes(
   opts: { dependencies: PurchasesRoutesDependencies }
 ): Promise<void> {
   const { dependencies } = opts;
-  fastify.post('/purchases', createPurchaseHandler(dependencies));
-  fastify.get('/purchases', getPurchasesHandler(dependencies));
+  const basePathPurchases = '/purchases';
+  fastify.post(basePathPurchases, createPurchaseHandler(dependencies));
+  fastify.get(basePathPurchases, getPurchasesHandler(dependencies));
 }

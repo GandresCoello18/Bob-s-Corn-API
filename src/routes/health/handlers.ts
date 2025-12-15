@@ -1,44 +1,32 @@
-import { FastifyReply, FastifyRequest } from 'fastify';
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+import { FastifyReply } from 'fastify';
 
 import { HealthRoutesDependencies } from './types';
 
 export function healthCheckHandler(dependencies: HealthRoutesDependencies) {
   const { healthCheckUseCase, logger } = dependencies;
+  const handlerLogger = logger.child({
+    service: 'health',
+    serviceHandler: 'healthCheckHandler',
+  });
 
-  return async (request: FastifyRequest, reply: FastifyReply) => {
-    const startTime = Date.now();
+  return async (_request: unknown, reply: FastifyReply) => {
+    handlerLogger.info('Executing health check handler');
 
     try {
       const result = await healthCheckUseCase.execute();
-      const duration = Date.now() - startTime;
       const allHealthy = result.services.database && result.services.cache;
       const statusCode = allHealthy ? 200 : 503;
 
-      if (!allHealthy) {
-        logger.warn(
-          {
-            method: request.method,
-            url: request.url,
-            statusCode,
-            duration: `${duration}ms`,
-            services: result.services,
-          },
-          'Health check failed - some services are unhealthy'
-        );
-      }
-
       return reply.code(statusCode).send(result);
     } catch (error) {
-      const duration = Date.now() - startTime;
-      logger.error(
+      handlerLogger.error(
         {
-          method: request.method,
-          url: request.url,
-          duration: `${duration}ms`,
           errorName: error instanceof Error ? error.name : 'UnknownError',
           errorMessage: error instanceof Error ? error.message : String(error),
         },
-        'Health check request failed'
+        'Error in health check handler'
       );
       throw error;
     }
