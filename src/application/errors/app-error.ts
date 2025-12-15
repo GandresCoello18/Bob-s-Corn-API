@@ -1,7 +1,6 @@
 import { ZodError } from 'zod';
 
 export enum ErrorCode {
-  // Client errors (4xx)
   BAD_REQUEST = 'BAD_REQUEST',
   UNAUTHORIZED = 'UNAUTHORIZED',
   FORBIDDEN = 'FORBIDDEN',
@@ -9,8 +8,6 @@ export enum ErrorCode {
   CONFLICT = 'CONFLICT',
   VALIDATION_ERROR = 'VALIDATION_ERROR',
   TOO_MANY_REQUESTS = 'TOO_MANY_REQUESTS',
-
-  // Server errors (5xx)
   INTERNAL_ERROR = 'INTERNAL_ERROR',
   SERVICE_UNAVAILABLE = 'SERVICE_UNAVAILABLE',
   DATABASE_ERROR = 'DATABASE_ERROR',

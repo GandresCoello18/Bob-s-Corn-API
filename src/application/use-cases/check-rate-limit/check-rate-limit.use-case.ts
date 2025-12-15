@@ -5,11 +5,7 @@ import { IRateLimiterRepository } from '@domain/repositories/rate-limiter-reposi
 import { getEnv } from '@config/env';
 import { Logger } from '@config/logger';
 
-export interface CheckRateLimitInput {
-  clientIp: string;
-  windowSeconds: number;
-  maxRequests: number;
-}
+import { CheckRateLimitInput } from './check-rate-limit.types';
 
 export class CheckRateLimitUseCase {
   private readonly isDevelopment: boolean;
@@ -58,7 +54,6 @@ export class CheckRateLimitUseCase {
       );
     }
 
-    // Record the request after checking (if not limited)
     await this.rateLimiterRepository.recordRequest(clientIp, windowSeconds);
     if (this.isDevelopment) {
       this.logger.debug({ clientIp }, 'Request recorded in rate limiter');

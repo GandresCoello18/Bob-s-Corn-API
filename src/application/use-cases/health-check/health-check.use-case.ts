@@ -3,15 +3,7 @@ import { IDatabaseRepository } from '@domain/repositories/database-repository.in
 
 import { Logger } from '@config/logger';
 
-export interface HealthCheckResult {
-  status: 'ok';
-  timestamp: string;
-  uptime: number;
-  services: {
-    database: boolean;
-    cache: boolean;
-  };
-}
+import { HealthCheckResult } from './health-check.types';
 
 export class HealthCheckUseCase {
   constructor(
@@ -31,7 +23,6 @@ export class HealthCheckUseCase {
       },
     };
 
-    // Check database - only log errors, not debug info
     try {
       checks.services.database = await this.databaseRepository.healthCheck();
       if (!checks.services.database) {
@@ -42,7 +33,6 @@ export class HealthCheckUseCase {
       checks.services.database = false;
     }
 
-    // Check cache - only log errors, not debug info
     try {
       checks.services.cache = await this.cacheRepository.healthCheck();
       if (!checks.services.cache) {
@@ -54,7 +44,6 @@ export class HealthCheckUseCase {
     }
 
     const allHealthy = checks.services.database && checks.services.cache;
-    // Only log warnings when services are unhealthy (reduce log noise in production)
     if (!allHealthy) {
       this.logger.warn(
         {

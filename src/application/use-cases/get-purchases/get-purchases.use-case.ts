@@ -5,27 +5,7 @@ import { PurchaseStatus } from '@domain/enums/purchase-status.enum';
 import { getEnv } from '@config/env';
 import { Logger } from '@config/logger';
 
-export interface Purchase {
-  id: string;
-  clientIp: string;
-  createdAt: Date;
-  status: PurchaseStatus;
-  meta: unknown;
-}
-
-export interface GetPurchasesResult {
-  purchases: Purchase[];
-  total: number;
-  limit: number;
-  offset: number;
-}
-
-export interface GetPurchasesInput {
-  clientIp: string;
-  limit?: number;
-  offset?: number;
-  status?: PurchaseStatus;
-}
+import { GetPurchasesInput, GetPurchasesResult } from './get-purchases.types';
 
 export class GetPurchasesUseCase {
   private readonly defaultLimit: number = 50;
@@ -43,7 +23,6 @@ export class GetPurchasesUseCase {
   async execute(input: GetPurchasesInput): Promise<GetPurchasesResult> {
     const { clientIp, limit = this.defaultLimit, offset = 0, status } = input;
 
-    // Validate and clamp limit
     const validLimit = Math.min(Math.max(1, limit), this.maxLimit);
     const validOffset = Math.max(0, offset);
 
@@ -54,7 +33,6 @@ export class GetPurchasesUseCase {
       );
     }
 
-    // Build where clause
     const where: { clientIp: string; status?: string } = {
       clientIp,
     };
@@ -63,7 +41,6 @@ export class GetPurchasesUseCase {
       where.status = status;
     }
 
-    // Fetch purchases with pagination
     const [purchases, total] = await Promise.all([
       this.prismaClient.purchase.findMany({
         where,

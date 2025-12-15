@@ -8,10 +8,10 @@ import { PrismaDatabaseRepository } from '@infrastructure/database/prisma-databa
 
 import { Logger } from '@config/logger';
 
-import { CheckRateLimitUseCase } from '../use-cases/check-rate-limit.use-case';
-import { GetPurchasesUseCase } from '../use-cases/get-purchases.use-case';
-import { HealthCheckUseCase } from '../use-cases/health-check.use-case';
-import { PurchaseCornUseCase } from '../use-cases/purchase-corn.use-case';
+import { CheckRateLimitUseCase } from '../use-cases/check-rate-limit/check-rate-limit.use-case';
+import { GetPurchasesUseCase } from '../use-cases/get-purchases/get-purchases.use-case';
+import { HealthCheckUseCase } from '../use-cases/health-check/health-check.use-case';
+import { PurchaseCornUseCase } from '../use-cases/purchase-corn/purchase-corn.use-case';
 
 export class DependencyContainer {
   private databaseRepository: IDatabaseRepository | null = null;
@@ -42,10 +42,7 @@ export class DependencyContainer {
       this.logger
     );
 
-    // Get PrismaClient from PrismaDatabaseRepository for use cases that need direct DB access
     const prismaClient = (this.databaseRepository as PrismaDatabaseRepository).getClient();
-
-    // Initialize rate limiter use case
     const checkRateLimitUseCase = new CheckRateLimitUseCase(
       this.rateLimiterRepository,
       this.logger

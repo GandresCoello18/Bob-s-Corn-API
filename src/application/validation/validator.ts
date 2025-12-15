@@ -1,13 +1,9 @@
 import { FastifyRequest } from 'fastify';
-import { ZodSchema, ZodError } from 'zod';
+import { ZodError } from 'zod';
 
 import { ValidationError } from '../errors/app-error';
 
-export interface ValidationSchemas {
-  body?: ZodSchema;
-  query?: ZodSchema;
-  params?: ZodSchema;
-}
+import { ValidationSchemas } from './validation.types';
 
 export function validateRequest<T = unknown>(
   request: FastifyRequest,
@@ -45,7 +41,7 @@ export function validateRequest<T = unknown>(
     }
   }
 
-  if (errors.length > 0) {
+  if (errors.length) {
     const combinedErrors = errors.flatMap((err) => err.errors);
     const combinedZodError = new ZodError(combinedErrors);
     throw ValidationError.fromZodError(combinedZodError);

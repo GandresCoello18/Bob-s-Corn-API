@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 
-import { CheckRateLimitUseCase } from '@/application/use-cases/check-rate-limit.use-case';
+import { CheckRateLimitUseCase } from '@/application/use-cases/check-rate-limit/check-rate-limit.use-case';
 
 import { PurchaseStatus } from '@domain/enums/purchase-status.enum';
 
@@ -8,11 +8,7 @@ import { RATE_LIMIT } from '@config/constants';
 import { getEnv } from '@config/env';
 import { Logger } from '@config/logger';
 
-export interface PurchaseCornResult {
-  success: boolean;
-  message: string;
-  timestamp: string;
-}
+import { PurchaseCornResult } from './purchase-corn.types';
 
 export class PurchaseCornUseCase {
   private readonly rateLimitWindowSeconds: number;
@@ -38,7 +34,6 @@ export class PurchaseCornUseCase {
     }
 
     try {
-      // Check rate limit using configured values
       if (this.isDevelopment) {
         this.logger.debug({ clientIp }, 'Checking rate limit before purchase');
       }
@@ -51,7 +46,6 @@ export class PurchaseCornUseCase {
         this.logger.debug({ clientIp }, 'Rate limit check passed, proceeding with purchase');
       }
 
-      // Create purchase record
       if (this.isDevelopment) {
         this.logger.debug({ clientIp }, 'Creating purchase record in database');
       }
@@ -91,7 +85,6 @@ export class PurchaseCornUseCase {
         'Error during corn purchase process'
       );
 
-      // Re-throw to let error handler process it
       throw error;
     }
   }

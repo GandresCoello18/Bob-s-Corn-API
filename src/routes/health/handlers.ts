@@ -1,21 +1,11 @@
-import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import { FastifyReply, FastifyRequest } from 'fastify';
 
-import { HealthCheckUseCase } from '@/application/use-cases/health-check.use-case';
+import { HealthRoutesDependencies } from './types';
 
-import { Logger } from '@config/logger';
+export function healthCheckHandler(dependencies: HealthRoutesDependencies) {
+  const { healthCheckUseCase, logger } = dependencies;
 
-interface HealthRoutesDependencies {
-  healthCheckUseCase: HealthCheckUseCase;
-  logger: Logger;
-}
-
-export async function healthRoutes(
-  fastify: FastifyInstance,
-  opts: { dependencies: HealthRoutesDependencies }
-): Promise<void> {
-  const { healthCheckUseCase, logger } = opts.dependencies;
-
-  fastify.get('/health', async (request: FastifyRequest, reply: FastifyReply) => {
+  return async (request: FastifyRequest, reply: FastifyReply) => {
     const startTime = Date.now();
 
     try {
@@ -52,5 +42,5 @@ export async function healthRoutes(
       );
       throw error;
     }
-  });
+  };
 }
