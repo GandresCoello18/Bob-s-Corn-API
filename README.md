@@ -30,7 +30,14 @@ Esta estructura garantiza separación de responsabilidades, testabilidad, manten
 - **Containerización**: Docker y Docker Compose
 - **Seguridad**: Helmet y CORS (habilitado a cualquier cliente *)
 
+Docker
 <img width="1919" height="590" alt="Captura de pantalla 2025-12-15 204055" src="https://github.com/user-attachments/assets/f5dce9d5-2eb2-4ca8-9047-322f1a2dcf1a" />
+
+PostgreSQL + PgAdmin
+<img width="1914" height="919" alt="Captura de pantalla 2025-12-15 210224" src="https://github.com/user-attachments/assets/c6ee6ae5-cf0f-45a5-9b34-5195054bf58d" />
+
+Ioredis + Redis Commands
+<img width="1317" height="261" alt="Captura de pantalla 2025-12-15 210055" src="https://github.com/user-attachments/assets/39f31510-a61d-4e53-a0b9-08f7a7efb6d2" />
 
 ## Requisitos Previos
 
