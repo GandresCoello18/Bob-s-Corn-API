@@ -13,7 +13,7 @@ Este proyecto sigue los principios de **Clean Architecture**, organizando el có
 - **Infrastructure**: Implementaciones técnicas (bases de datos, cache, HTTP)
 - **Presentation**: Handlers y rutas HTTP
 
-- ![arquitecture](https://github.com/user-attachments/assets/81397599-6609-4480-b05d-474989099a9e)
+![arquitecture](https://github.com/user-attachments/assets/81397599-6609-4480-b05d-474989099a9e)
 
 
 Esta estructura garantiza separación de responsabilidades, testabilidad, mantenibilidad y la independencia del código de negocio respecto a frameworks y tecnologías externas.
@@ -29,6 +29,15 @@ Esta estructura garantiza separación de responsabilidades, testabilidad, manten
 - **Testing**: Jest
 - **Containerización**: Docker y Docker Compose
 - **Seguridad**: Helmet y CORS (habilitado a cualquier cliente *)
+
+Docker
+<img width="1919" height="590" alt="Captura de pantalla 2025-12-15 204055" src="https://github.com/user-attachments/assets/f5dce9d5-2eb2-4ca8-9047-322f1a2dcf1a" />
+
+PostgreSQL + PgAdmin
+<img width="1914" height="919" alt="Captura de pantalla 2025-12-15 210224" src="https://github.com/user-attachments/assets/c6ee6ae5-cf0f-45a5-9b34-5195054bf58d" />
+
+Ioredis + Redis Commands
+<img width="1317" height="261" alt="Captura de pantalla 2025-12-15 210055" src="https://github.com/user-attachments/assets/39f31510-a61d-4e53-a0b9-08f7a7efb6d2" />
 
 ## Requisitos Previos
 
@@ -182,3 +191,5 @@ El servidor estará disponible en `http://localhost:3000`
 ---
 
 ⌨️ con ❤️ por [Andres Coello Goyes](https://linktr.ee/gandrescoello) 😊
+
+<img width="400" height="400" alt="1764558900283" src="https://github.com/user-attachments/assets/cde88968-7856-49ec-bdb1-53a82bf9caa3" />
