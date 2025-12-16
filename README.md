@@ -13,7 +13,7 @@ Este proyecto sigue los principios de **Clean Architecture**, organizando el có
 - **Infrastructure**: Implementaciones técnicas (bases de datos, cache, HTTP)
 - **Presentation**: Handlers y rutas HTTP
 
-- ![arquitecture](https://github.com/user-attachments/assets/81397599-6609-4480-b05d-474989099a9e)
+![arquitecture](https://github.com/user-attachments/assets/81397599-6609-4480-b05d-474989099a9e)
 
 
 Esta estructura garantiza separación de responsabilidades, testabilidad, mantenibilidad y la independencia del código de negocio respecto a frameworks y tecnologías externas.
@@ -29,6 +29,8 @@ Esta estructura garantiza separación de responsabilidades, testabilidad, manten
 - **Testing**: Jest
 - **Containerización**: Docker y Docker Compose
 - **Seguridad**: Helmet y CORS (habilitado a cualquier cliente *)
+
+<img width="1919" height="590" alt="Captura de pantalla 2025-12-15 204055" src="https://github.com/user-attachments/assets/f5dce9d5-2eb2-4ca8-9047-322f1a2dcf1a" />
 
 ## Requisitos Previos
 
